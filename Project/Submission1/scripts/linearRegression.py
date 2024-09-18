@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
-from outlier_removal import remove_outliers_iqr, remove_outliers_zscore
+from outlier_removal import remove_outliers_iqr, remove_outliers_zscore, remove_outliers_isolation_forest
 
 # Load data
 X_train = np.load("../data/X_train.npy")
@@ -11,15 +11,16 @@ y_train = np.load("../data/y_train.npy")
 X_test = np.load("../data/X_test.npy")
 
 # Data visualization
+plt.figure(1)
 plt.boxplot(y_train, vert=False, patch_artist=True, boxprops=dict(facecolor="lightblue"))
 plt.title("Boxplot of y_train (With Outliers)")
-plt.show()
 
 # Dependent variable outlier removal
-mask = remove_outliers_iqr(y_train)
+mask = remove_outliers_isolation_forest(y_train)
 X_train_filtered = X_train[mask]
 y_train_filtered = y_train[mask]
 
+plt.figure(2)
 plt.boxplot(y_train_filtered, vert=False, patch_artist=True, boxprops=dict(facecolor="lightblue"))
 plt.title("Boxplot of Filtered y_train (Outliers Removed)")
 plt.show()
