@@ -42,7 +42,7 @@ def remove_outliers_isolation_forest(y, contamination=0.25):
     return mask
 
 
-def remove_outliers_lof(y, contamination=0.25, n_neighbors=60):
+def remove_outliers_lof(y, contamination=0.25, n_neighbors=98):
     """
     Removes outliers from the input array using the Local Outlier Factor (LOF) method.
 
