@@ -17,13 +17,16 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_train)
 
 # Coefficients and metrics
-print("Coefficients: \n", model.coef_)
+print(f"Intercept: {model.intercept_:.2f}")
+print(f"Coefficients: {model.coef_:.2f}\n")
+
 print("SSE: %.2f" % np.sum((y_train - y_pred)**2))
 print("MSE: %.2f" % mean_squared_error(y_train, y_pred))
 print("Coefficient of determination: %.2f" % r2_score(y_train, y_pred))
 
 # Data visualization
 plt.boxplot(y_train, vert=False, patch_artist=True, boxprops=dict(facecolor="lightblue"))
+plt.title("Boxplot of y_train")
 plt.show()
 
 """
