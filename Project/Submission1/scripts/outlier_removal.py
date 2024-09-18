@@ -50,7 +50,7 @@ def remove_outliers_isolation_forest(y, contamination=0.25):
     Returns:
     numpy array: Boolean mask indicating non-outlier entries
     """
-    iso_forest = IsolationForest(contamination=contamination, random_state=42)
-    outlier_labels = iso_forest.fit_predict(y.reshape(-1, 1))  # Reshape y to 2D
+    isolation_forest = IsolationForest(contamination=contamination, random_state=1)
+    outlier_labels = isolation_forest.fit_predict(y.reshape(-1, 1))  # Reshape y to 2D
     mask = outlier_labels == 1  # Inliers are labeled as 1, outliers as -1
     return mask

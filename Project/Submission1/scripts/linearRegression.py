@@ -12,17 +12,22 @@ X_test = np.load("../data/X_test.npy")
 
 # Data visualization
 plt.figure(1)
-plt.boxplot(y_train, vert=False, patch_artist=True, boxprops=dict(facecolor="lightblue"))
 plt.title("Boxplot of y_train (With Outliers)")
+plt.boxplot(y_train, vert=False, patch_artist=True, boxprops=dict(facecolor="lightblue"))
 
 # Dependent variable outlier removal
-mask = remove_outliers_isolation_forest(y_train)
+mask = remove_outliers_iqr(y_train)
 X_train_filtered = X_train[mask]
 y_train_filtered = y_train[mask]
 
 plt.figure(2)
-plt.boxplot(y_train_filtered, vert=False, patch_artist=True, boxprops=dict(facecolor="lightblue"))
+plt.title("Inliers detected")
+plt.scatter(range(len(y_train)), y_train, c=mask, cmap='coolwarm', label='Inliers')
+plt.xlabel("Sample index"); plt.ylabel("y values (Toxic Algae Concentration)"); plt.legend()
+
+plt.figure(3)
 plt.title("Boxplot of Filtered y_train (Outliers Removed)")
+plt.boxplot(y_train_filtered, vert=False, patch_artist=True, boxprops=dict(facecolor="lightblue"))
 plt.show()
 
 # Apply regression model
