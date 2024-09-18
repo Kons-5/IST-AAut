@@ -1,8 +1,8 @@
 #!/bin/python3
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.linear_model import LinearRegression, RANSACRegressor, TheilSenRegressor
 from outlier_removal import remove_outliers_iqr, remove_outliers_isolation_forest, remove_outliers_lof
 
 # Load data
@@ -34,14 +34,16 @@ plt.show()
 
 # Apply regression model
 model = LinearRegression()
+# model = TheilSenRegressor()
+# model = RANSACRegressor(base_estimator=LinearRegression(), random_state=100)
 model.fit(X_train_filtered, y_train_filtered)
 
 # Predict values
 y_pred = model.predict(X_train_filtered)
 
 # Display the intercept and coefficients
-print(f"Intercept: {model.intercept_}")
-print(f"Coefficients: {model.coef_}\n")
+print(f"Intercept: {model.intercept_}\nCoefficients: {model.coef_}\n")
+# print(f"Intercept: {model.estimator_.intercept_}\nCoefficients: {model.estimator_.coef_}\n")
 
 # Calculate and print metrics
 sse = np.sum((y_train_filtered - y_pred) ** 2)
