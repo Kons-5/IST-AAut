@@ -18,7 +18,7 @@ y_pred = model.predict(X_train)
 
 # Coefficients and metrics
 print(f"Intercept: {model.intercept_:.2f}")
-print(f"Coefficients: {model.coef_:.2f}\n")
+print(f"Coefficients: {model.coef_}\n")
 
 print("SSE: %.2f" % np.sum((y_train - y_pred)**2))
 print("MSE: %.2f" % mean_squared_error(y_train, y_pred))
