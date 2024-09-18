@@ -8,27 +8,24 @@ from sklearn.metrics import mean_squared_error, r2_score
 X_train = np.load("X_train.npy")
 y_train = np.load("y_train.npy")
 X_test = np.load("X_test.npy")
-y_test = np.load("y_test.npy")
-
-print(f"X_train shape: {X_train.shape}\n X_train type: {type(X_train)}\n")
-print(f"y_train shape: {y_train.shape}\n y_train type: {type(y_train)}")
-print(f"X_test shape: {X_test.shape}\n X_test type: {type(X_test)}\n")
-print(f"y_test shape: {y_test.shape}\n y_test type: {type(y_test)}")
 
 # Apply regression model
-reg = LinearRegression()
-reg.fit(X_train, y_train)
+model = LinearRegression()
+model.fit(X_train, y_train)
 
 # Predict values
-y_pred = reg.predict(X)
+y_pred = model.predict(X_train)
 
 # Coefficients and metrics
-print("Coefficients: \n", regr.coef_)
-print("Mean squared error: %.2f" % mean_squared_error(y_test, y_pred))
-print("Coefficient of determination: %.2f" % r2_score(y_test, y_pred))
-
+print("Coefficients: \n", model.coef_)
+print("SSE: %.2f" % np.sum((y_train - y_pred)**2))
+print("MSE: %.2f" % mean_squared_error(y_train, y_pred))
+print("Coefficient of determination: %.2f" % r2_score(y_train, y_pred))
 
 # Data visualization
+plt.boxplot(y_train, vert=False, patch_artist=True, boxprops=dict(facecolor="lightblue"))
+plt.show()
+
 """
 plt.figure(1), plt.scatter(X_train[:,0], y_train), plt.title("X1")
 plt.figure(2), plt.scatter(X_train[:,1], y_train), plt.title("X2")
