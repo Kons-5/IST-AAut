@@ -3,6 +3,7 @@
 import numpy as np
 from scipy import stats
 from sklearn.ensemble import IsolationForest
+from sklearn.neighbors import LocalOutlierFactor
 
 def remove_outliers_iqr(y):
     """
@@ -24,21 +25,6 @@ def remove_outliers_iqr(y):
     mask = (y >= lower_bound) & (y <= upper_bound)
     return mask
 
-def remove_outliers_zscore(y, threshold=3):
-    """
-    Removes outliers from the input array using the Z-score method.
-
-    Parameters:
-    y (numpy array): 1D array from which to remove outliers
-    threshold (float): Z-score threshold for identifying outliers (default is 3)
-
-    Returns:
-    numpy array: Boolean mask indicating non-outlier entries
-    """
-    z_scores = np.abs(stats.zscore(y))
-    mask = z_scores < threshold
-    return mask
-
 def remove_outliers_isolation_forest(y, contamination=0.25):
     """
     Removes outliers from the input array using the Isolation Forest method.
@@ -53,4 +39,22 @@ def remove_outliers_isolation_forest(y, contamination=0.25):
     isolation_forest = IsolationForest(contamination=contamination, random_state=1)
     outlier_labels = isolation_forest.fit_predict(y.reshape(-1, 1))  # Reshape y to 2D
     mask = outlier_labels == 1  # Inliers are labeled as 1, outliers as -1
+    return mask
+
+
+def remove_outliers_lof(y, contamination=0.25, n_neighbors=60):
+    """
+    Removes outliers from the input array using the Local Outlier Factor (LOF) method.
+
+    Parameters:
+    y (numpy array): 1D array from which to remove outliers
+    contamination (float): The proportion of outliers in the data (default is 0.25)
+    n_neighbors (int): Number of neighbors to use for LOF
+
+    Returns:
+    numpy array: Boolean mask indicating non-outlier entries
+    """
+    lof = LocalOutlierFactor(n_neighbors=n_neighbors, contamination=contamination)
+    outlier_labels = lof.fit_predict(y.reshape(-1, 1))
+    mask = outlier_labels == 1
     return mask
