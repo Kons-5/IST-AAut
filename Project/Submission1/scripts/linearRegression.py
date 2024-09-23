@@ -2,8 +2,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.linear_model import LinearRegression, RANSACRegressor, TheilSenRegressor
+from sklearn.linear_model import LinearRegression, RANSACRegressor, TheilSenRegressor, Ridge
 from outlier_removal import remove_outliers_iqr, remove_outliers_isolation_forest, remove_outliers_lof
+from sklearn import linear_model
 
 # Load data
 X_train = np.load("../data/X_train.npy")
@@ -13,7 +14,8 @@ X_test = np.load("../data/X_test.npy")
 # Data visualization
 plt.figure(1)
 plt.title("Boxplot of y_train (With Outliers)")
-plt.boxplot(y_train, vert=False, patch_artist=True, boxprops=dict(facecolor="lightblue"))
+plt.boxplot(y_train, vert=False, patch_artist=True,
+            boxprops=dict(facecolor="lightblue"))
 
 # Dependent variable outlier removal
 mask = remove_outliers_lof(y_train)
@@ -24,26 +26,32 @@ print(len(y_train_filtered))
 
 plt.figure(2)
 plt.title("Inliers detected")
-plt.scatter(range(len(y_train)), y_train, c=mask, cmap='coolwarm', label='Inliers')
-plt.xlabel("Sample index"); plt.ylabel("y values (Toxic Algae Concentration)"); plt.legend()
+plt.scatter(range(len(y_train)), y_train, c=mask,
+            cmap='coolwarm', label='Inliers')
+plt.xlabel("Sample index")
+plt.ylabel("y values (Toxic Algae Concentration)")
+plt.legend()
 
 plt.figure(3)
 plt.title("Boxplot of Filtered y_train (Outliers Removed)")
-plt.boxplot(y_train_filtered, vert=False, patch_artist=True, boxprops=dict(facecolor="lightblue"))
-plt.show()
+plt.boxplot(y_train_filtered, vert=False, patch_artist=True,
+            boxprops=dict(facecolor="lightblue"))
+# plt.show()
 
 # Apply regression model
-model = LinearRegression()
+# model = LinearRegression()
 # model = TheilSenRegressor()
-# model = RANSACRegressor(base_estimator=LinearRegression(), random_state=100)
+model = RANSACRegressor(estimator=LinearRegression(),
+                        random_state=100, min_samples=150, max_trials=1000, residual_threshold=1)
 model.fit(X_train_filtered, y_train_filtered)
 
 # Predict values
 y_pred = model.predict(X_train_filtered)
 
 # Display the intercept and coefficients
-print(f"Intercept: {model.intercept_}\nCoefficients: {model.coef_}\n")
-# print(f"Intercept: {model.estimator_.intercept_}\nCoefficients: {model.estimator_.coef_}\n")
+# print(f"Intercept: {model.intercept_}\nCoefficients: {model.coef_}\n")
+print(
+    f"Intercept: {model.estimator_.intercept_}\nCoefficients: {model.estimator_.coef_}\n")
 
 # Calculate and print metrics
 sse = np.sum((y_train_filtered - y_pred) ** 2)
