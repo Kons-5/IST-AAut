@@ -8,6 +8,7 @@ from sklearn.metrics import mean_squared_error, r2_score, make_scorer
 from sklearn.model_selection import train_test_split, cross_val_score
 import pandas as pd
 import numpy as np
+from statistics import mean
 import statsmodels.api as sm
 from sklearn.svm import SVR
 
@@ -47,8 +48,25 @@ def ScatterPlot(mask, y_train):
     plt.show()
 
 
+def neighborSize(residuals):
+    n_neighbors_range = list(range(20, len(residuals)))
+
+    avg_lof_scores = []
+
+    for n in n_neighbors_range:
+        lof = LocalOutlierFactor(n_neighbors=n)
+        lof.fit(residuals.reshape(-1, 1))
+        lof_scores = -lof.negative_outlier_factor_
+        avg_lof_scores.append(np.mean(lof_scores))
+
+    index = max(avg_lof_scores)
+    index = avg_lof_scores.index(index)
+    index = n_neighbors_range[index]
+    print(index)
+    return index
+
+
 def iterative_lof_outlier_removal(model, X_train, y_train, contamination=0.25, max_iterations=5):
-    model = HuberRegressor()
     for iteration in range(max_iterations):
         # Step 1: Fit the model on the data
         model.fit(X_train, y_train)
@@ -69,7 +87,7 @@ def iterative_lof_outlier_removal(model, X_train, y_train, contamination=0.25, m
         X_train_filtered = X_train[mask]
         y_train_filtered = y_train[mask]
 
-        LOFPlot(residuals, outlier_labels, X_scores)
+        # LOFPlot(residuals, outlier_labels, X_scores)
 
         # If no more outliers are found, break the loop
         if len(X_train_filtered) == len(X_train):
@@ -84,9 +102,9 @@ def iterative_lof_outlier_removal(model, X_train, y_train, contamination=0.25, m
     return X_train_filtered, y_train_filtered
 
 
-def CrossValidation(X, y, model, param_grid):
+def CrossValidationTuning(X, y, model, param_grid, n_folds=5):
 
-    # Define the scoring metric
+    # Scoring metric
     scoring = make_scorer(mean_squared_error, greater_is_better=False)
 
     # Initialize GridSearchCV
@@ -94,7 +112,7 @@ def CrossValidation(X, y, model, param_grid):
         estimator=model,
         param_grid=param_grid,
         scoring=scoring,
-        cv=5,
+        cv=n_folds,
         n_jobs=-1
     )
 
@@ -102,21 +120,21 @@ def CrossValidation(X, y, model, param_grid):
     grid_search.fit(X, y)
 
     # Extract the best parameters and estimator
-    best_params = grid_search.best_params_
     best_model = grid_search.best_estimator_
+    best_params = grid_search.best_params_
+    best_index = grid_search.best_index_
 
-    cv_scores = cross_val_score(
-        model, X_train_cleaned, y_train_cleaned, cv=5, scoring='neg_mean_squared_error')
+    # Print best hyperparameters
+    print(f"Best Hyperparameters: {best_params}\n")
 
     # Print the mean RMSE and the variance across folds
-    mean_rmse = (-cv_scores.mean()) ** 0.5
-    rmse_std = cv_scores.std() ** 0.5
+    mean_rmse = np.sqrt(-grid_search.cv_results_[
+                        'mean_test_score'][best_index])
+    std_rmse = np.sqrt(grid_search.cv_results_['std_test_score'][best_index])
 
-    print(f"\nCross-Validated RMSE: {mean_rmse}")
-    print(f"RMSE Std Deviation: {rmse_std}")
-
-    print("Best Hyperparameters:")
-    print(best_params)
+    print(f"-> Best Model Performance for {n_folds}-Fold CV")
+    print(f"Cross-Validated RMSE: {mean_rmse}")
+    print(f"RMSE STD Deviation: {std_rmse}\n")
 
     return best_model
 
@@ -127,20 +145,31 @@ y_train = np.load("../../data/y_train.npy")
 
 
 X_train_cleaned, y_train_cleaned = iterative_lof_outlier_removal(
-    LinearRegression(), X_train, y_train, contamination=0.005, max_iterations=50)
+    LinearRegression(), X_train, y_train, contamination=0.0208, max_iterations=12)
 
 # Define parameter grid
+# Ridge and Lasso
 param_grid = {
     'alpha': np.arange(0.1, 100, 0.1)
 }
+
 """
+# ElasticNet
+param_grid = {
+    'alpha': np.arange(0.1, 100, 0.1),
+    'l1_ratio': np.arange(0.1, 100, 0.1)
+}
+"""
+
+"""
+# SVR with Linear Kernel
 param_grid = {
     'C': [1],
     'epsilon': [0.1]
 }
 """
-model = CrossValidation(X_train_cleaned, y_train_cleaned,
-                        Ridge(), param_grid)
+model = CrossValidationTuning(X_train_cleaned, y_train_cleaned,
+                              Ridge(), param_grid)
 
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(
