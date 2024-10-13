@@ -27,7 +27,7 @@ nb = 0:9;  % Number of past inputs (same range as above)
 nk = 0:9;  % Input delay (start with 0 if unknown)
 
 % Generate the possible model structures
-NN = struc(9, 0, 200);
+NN = struc(na, nb, nk);
 
 % Evaluate model structures using the `arxstruc` function
 V = arxstruc(data_train, data_train, NN);
@@ -93,3 +93,32 @@ title('Response of ARX Model to a 5*Step Input');
 xlabel('Time (s)');
 ylabel('Output');
 grid on;
+
+
+%%
+
+% Step 1: Compute the cross-correlation between Y and X
+% The 'coeff' option normalizes the cross-correlation coefficients
+[c, lags] = xcorr(Y, X, 'coeff');
+
+% Step 2: Plot the cross-correlation function
+figure;
+stem(lags, c, 'filled');
+xlabel('Lag');
+ylabel('Cross-Correlation Coefficient');
+title('Cross-Correlation between Input (X) and Output (Y)');
+xlim([0 16])
+grid on;
+
+% Step 3: Highlight the lag corresponding to d = 6
+hold on;
+line([6, 6], [min(c), max(c)], 'Color', 'red', 'LineStyle', '--', 'LineWidth', 1.5);
+text(6, max(c), '\leftarrow d = 6', 'Color', 'red', 'FontSize', 12, 'HorizontalAlignment', 'left');
+
+% Step 4: Highlight the range of lags for m = 9
+range_lags = (6):(6+9); % Lags from d to d + m
+plot(range_lags, c(ismember(lags, range_lags)), 'ro', 'MarkerFaceColor', 'r');
+
+% Display message about significant correlations
+disp('Check if the correlation remains significant in the highlighted region.');
+
