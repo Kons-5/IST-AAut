@@ -10,9 +10,9 @@ This repository contains lab materials for the IST-AAut (Machine Learning) cours
 
 This section covers regression analysis tasks using synthetic data to explore key concepts in predictive modeling.
 
-- **ML-Submission1**: Contains the Jupyter Notebook for **Multiple Linear Regression with Outliers**, implementing outlier removal, cross-validation, and tuning techniques as described in the report.
+- [ML-Submission1](Submissions/ML-Submission1): Contains the Jupyter Notebook for **Multiple Linear Regression with Outliers**, implementing outlier removal, cross-validation, and tuning techniques as described in the report.
 
-- **ML-Submission2**: Contains the Jupyter Notebook for the **ARX Model**, focusing on time-series data and system response modeling, with parameter optimization techniques.
+- [ML-Submission2](Submissions/ML-Submission2): Contains the Jupyter Notebook for the **ARX Model**, focusing on time-series data and system response modeling, with parameter optimization techniques.
 
 #### Learning Objectives
 - Understand multiple linear regression with synthetic data containing noise and outliers.
@@ -27,9 +27,9 @@ This section covers regression analysis tasks using synthetic data to explore ke
 
 This section explores image classification and segmentation tasks focused on low-resolution (48x48) Martian crater analysis.
 
-- **ML-Submission3**: Contains the Jupyter Notebook for **Image Classification** using SVC and CNN models, with techniques for handling imbalanced data and data augmentation.
+- [ML-Submission3](Submissions/ML-Submission3): Contains the Jupyter Notebook for **Image Classification** using SVC and CNN models, with techniques for handling imbalanced data and data augmentation.
 
-- **ML-Submission4**: Contains the Jupyter Notebook for **Image Segmentation**, implementing MLP-Fusion and U-Net models for pixel-wise segmentation.
+- [ML-Submission4](Submissions/ML-Submission4): Contains the Jupyter Notebook for **Image Segmentation**, implementing MLP-Fusion and U-Net models for pixel-wise segmentation.
 
 #### Learning Objectives
 - Develop machine learning models to classify crater vs. non-crater images.
